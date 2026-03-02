@@ -30,8 +30,9 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
   }
 
@@ -137,18 +138,56 @@ class DatabaseService {
       )
     ''');
 
-    // Insert default admin user
+    // Seed default users
+    await _seedUsers(db);
+
+    print('✅ Database tables created successfully');
+  }
+
+  // Upgrade handler — seeds new demo users when upgrading from v1 → v2
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _seedUsers(db);
+      print('✅ Database upgraded to version $newVersion');
+    }
+  }
+
+  // Insert all demo / seed users
+  Future<void> _seedUsers(Database db) async {
+    final now = DateTime.now().toIso8601String();
+
     await db.insert('users', {
       'email': 'admin@mamacare.com',
       'password': 'admin123',
       'name': 'Admin User',
       'role': 'admin',
       'is_active': 1,
-      'created_at': DateTime.now().toIso8601String(),
+      'created_at': now,
       'preferences': null,
-    });
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
-    print('✅ Database tables created successfully');
+    await db.insert('users', {
+      'email': 'patient@mamacare.com',
+      'password': 'patient123',
+      'name': 'Jane Doe',
+      'role': 'patient',
+      'is_active': 1,
+      'created_at': now,
+      'preferences': null,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
+    await db.insert('users', {
+      'email': 'doctor@mamacare.com',
+      'password': 'doctor123',
+      'name': 'Dr. Smith',
+      'role': 'doctor',
+      'specialization': 'Obstetrics',
+      'is_active': 1,
+      'created_at': now,
+      'preferences': null,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
+    print('✅ Seed users inserted');
   }
 
   // Initialize database (call this in main.dart)

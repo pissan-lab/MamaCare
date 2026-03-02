@@ -2,6 +2,7 @@
 
 import 'dart:math';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/user.dart';
 import './database_service.dart';
@@ -14,8 +15,47 @@ class AuthService {
   final _logService = SystemLogService.instance;
 
   User? _currentUser;
-  
+
+  // ── Web / demo in-memory users (used when kIsWeb or DB unavailable) ──────
+  static final Map<String, User> _demoUsers = {
+    'admin@mamacare.com': User(
+      id: 1,
+      email: 'admin@mamacare.com',
+      password: 'admin123',
+      name: 'Admin User',
+      role: UserRole.admin,
+      isActive: true,
+      createdAt: '2026-01-01T00:00:00.000',
+    ),
+    'doctor@mamacare.com': User(
+      id: 2,
+      email: 'doctor@mamacare.com',
+      password: 'doctor123',
+      name: 'Dr. Smith',
+      role: UserRole.doctor,
+      specialization: 'Obstetrics',
+      isActive: true,
+      createdAt: '2026-01-01T00:00:00.000',
+    ),
+    'patient@mamacare.com': User(
+      id: 3,
+      email: 'patient@mamacare.com',
+      password: 'patient123',
+      name: 'Jane Doe',
+      role: UserRole.patient,
+      isActive: true,
+      createdAt: '2026-01-01T00:00:00.000',
+    ),
+  };
+
   AuthService._init();
+
+  // Call this on web instead of initialize()
+  void initializeWeb() {
+    // Nothing to do – _demoUsers is already populated statically.
+    // Try to restore a previously logged-in demo user from a simple flag.
+    debugPrint('ℹ️ AuthService: running in web/demo mode');
+  }
 
   User? get currentUser => _currentUser;
   
@@ -45,48 +85,74 @@ class AuthService {
     }
   }
 
-  // Login user (basic email/password check).  If multi-factor is enabled
-  // for the account, the caller should invoke [sendMfaCode] and then
-  // [verifyMfaCode] separately; the logic for deciding whether to prompt for
-  // the code is left to the UI layer.
+  // Login user – works on both native (SQLite) and web (in-memory demo users).
   Future<bool> login(String email, String password) async {
     try {
-      final users = await _dbService.query(
-        'users',
-        where: 'email = ? AND password = ? AND is_active = 1',
-        whereArgs: [email, password],
-      );
+      // ── Web: use in-memory demo credentials ─────────────────────────────
+      if (kIsWeb) {
+        final demo = _demoUsers[email.trim().toLowerCase()];
+        if (demo == null || demo.password != password || !demo.isActive) {
+          debugPrint('❌ Web login failed for $email');
+          return false;
+        }
+        _currentUser = demo;
+        debugPrint('✅ Web login successful for ${_currentUser!.email}');
+        return true;
+      }
 
+      // ── Native: SQLite lookup ────────────────────────────────────────────
+      List<Map<String, dynamic>> users;
+      try {
+        users = await _dbService.query(
+          'users',
+          where: 'email = ? AND password = ? AND is_active = 1',
+          whereArgs: [email.trim(), password],
+        );
+      } catch (_) {
+        users = [];
+      }
+
+      // If DB has no matching user, fall back to demo credentials
       if (users.isEmpty) {
-        print('❌ Invalid email or password');
+        final demo = _demoUsers[email.trim().toLowerCase()];
+        if (demo != null && demo.password == password && demo.isActive) {
+          _currentUser = demo;
+          debugPrint('✅ Demo fallback login for ${_currentUser!.email}');
+          return true;
+        }
+        debugPrint('❌ Invalid email or password');
         return false;
       }
 
       _currentUser = User.fromMap(users.first);
-      
+
       // Update last login
-      await _dbService.update(
-        'users',
-        {'last_login': DateTime.now().toIso8601String()},
-        where: 'id = ?',
-        whereArgs: [_currentUser!.id],
-      );
+      try {
+        await _dbService.update(
+          'users',
+          {'last_login': DateTime.now().toIso8601String()},
+          where: 'id = ?',
+          whereArgs: [_currentUser!.id],
+        );
 
-      // Save to secure storage
-      await _secureStorage.write(key: 'user_email', value: email);
+        // Save to secure storage
+        await _secureStorage.write(key: 'user_email', value: email);
 
-      // Log login action
-      await _logService.logAction(
-        userId: _currentUser!.id.toString(),
-        userRole: _currentUser!.role.toString().split('.').last,
-        action: 'LOGIN',
-        description: '${_currentUser!.name} logged in',
-      );
+        // Audit log
+        await _logService.logAction(
+          userId: _currentUser!.id.toString(),
+          userRole: _currentUser!.role.toString().split('.').last,
+          action: 'LOGIN',
+          description: '${_currentUser!.name} logged in',
+        );
+      } catch (_) {
+        // Non-critical – don't fail the login if logging fails
+      }
 
-      print('✅ Login successful for ${_currentUser!.email}');
+      debugPrint('✅ Login successful for ${_currentUser!.email}');
       return true;
     } catch (e) {
-      print('❌ Login error: $e');
+      debugPrint('❌ Login error: $e');
       return false;
     }
   }

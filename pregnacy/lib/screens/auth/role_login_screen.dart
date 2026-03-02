@@ -47,27 +47,23 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      // Verify user role matches selected role
-      if (_authService.currentUser?.role == _selectedRole) {
-        _navigateToDashboard();
-      } else {
-        setState(() {
-          _errorMessage = 'User role does not match selected role';
-          _isLoading = false;
-        });
-      }
+      // Navigate to the correct dashboard for this user's actual role.
+      _navigateToDashboard();
     } else {
       setState(() {
-        _errorMessage = 'Invalid email or password';
+        _errorMessage = 'Invalid email or password. Check the demo credentials below.';
         _isLoading = false;
       });
     }
   }
 
   void _navigateToDashboard() {
-    final route = _selectedRole == UserRole.admin
+    // Navigate based on the actual logged-in user's role,
+    // not the role selector (which is just a UI hint).
+    final role = _authService.currentUser?.role;
+    final route = role == UserRole.admin
         ? '/admin-dashboard'
-        : _selectedRole == UserRole.doctor
+        : role == UserRole.doctor
             ? '/doctor-dashboard'
             : '/patient-dashboard';
 
@@ -381,7 +377,11 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
               ),
               SizedBox(height: 8),
-              Text('Admin: admin@mamacare.com / admin123', style: TextStyle(fontSize: 11)),
+              Text('Patient:  patient@mamacare.com / patient123', style: TextStyle(fontSize: 11)),
+              SizedBox(height: 4),
+              Text('Doctor:   doctor@mamacare.com / doctor123',  style: TextStyle(fontSize: 11)),
+              SizedBox(height: 4),
+              Text('Admin:    admin@mamacare.com / admin123',     style: TextStyle(fontSize: 11)),
             ],
           ),
         ),

@@ -8,6 +8,7 @@ import 'screens/patient/patient_dashboard_screen.dart';
 import 'screens/privacy_settings_screen.dart';
 import 'services/database_service.dart';
 import 'services/auth_service.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,10 +22,12 @@ void main() async {
 
     // Initialize auth
     await AuthService.instance.initialize();
+
+    // Initialize local notifications
+    await NotificationService.instance.initialize();
   } else {
-    // On web, you may want to provide alternative storage or simply run in a
-    // 'read‑only/demo' mode.  For now we just log to console.
-    debugPrint('⚠️ Running on web - skipping database/auth initialization.');
+    // Web: use in-memory demo users (SQLite is not available on web).
+    AuthService.instance.initializeWeb();
   }
 
   runApp(const PregnancyApp());

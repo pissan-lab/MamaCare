@@ -1,9 +1,7 @@
 // lib/screens/patient/patient_dashboard_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:mamacare/models/user_profile.dart';
-import 'package:mamacare/services/database_service.dart';
-import 'package:mamacare/services/auth_service.dart';
+import 'dart:math' as math;
 
 class PatientDashboardScreen extends StatefulWidget {
   const PatientDashboardScreen({Key? key}) : super(key: key);
@@ -13,13 +11,17 @@ class PatientDashboardScreen extends StatefulWidget {
 }
 
 class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
-  final _dbService = DatabaseService.instance;
-  final _authService = AuthService.instance;
-  UserProfile? _userProfile;
-  Map<String, dynamic>? _recentVitals;
-  int _todayKickCount = 0;
-  int _totalContractions = 0;
-  bool _isLoading = true;
+  int _selectedNavIndex = 0;
+  
+  // Theme Colors
+  static const Color blush = Color(0xFFF5E6E0);
+  static const Color rose = Color(0xFFD4847A);
+  static const Color deep = Color(0xFF3D2C2C);
+  static const Color sage = Color(0xFF8AAB9B);
+  static const Color cream = Color(0xFFFDF6F0);
+  static const Color warm = Color(0xFFE8C9B8);
+  static const Color textColor = Color(0xFF4A3535);
+  static const Color muted = Color(0xFF9B8080);
 
   @override
   void initState() {

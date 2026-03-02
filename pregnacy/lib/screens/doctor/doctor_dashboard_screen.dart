@@ -117,7 +117,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome, Dr. ${_authService.currentUser?.name}! 👨‍⚕️',
+                            'Welcome, Dr. ${_authService.currentUser?.name ?? 'Doctor'}! 👨‍⚕️',
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -151,22 +151,18 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   // Stats
                   Row(
                     children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          'Total Patients',
-                          _assignedPatients.length.toString(),
-                          Icons.person,
-                          Colors.blue,
-                        ),
+                      _buildMiniStat(
+                        Icons.people,
+                        _assignedPatients.length.toString(),
+                        'Patients',
+                        Colors.blue,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          'Avg. Weeks',
-                          _calculateAverageWeeks(),
-                          Icons.calendar_today,
-                          Colors.pink,
-                        ),
+                      const SizedBox(width: 8),
+                      _buildMiniStat(
+                        Icons.calendar_today,
+                        _calculateAverageWeeks(),
+                        'Avg. Weeks',
+                        Colors.pink,
                       ),
                     ],
                   ),
@@ -270,41 +266,28 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Card(
-      elevation: 2,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [color.withOpacity(0.7), color.withOpacity(0.3)],
+  Widget _buildMiniStat(IconData icon, String value, String label, MaterialColor color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: color.shade50,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.shade200),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color.shade700),
+          const SizedBox(width: 5),
+          Text(
+            '$value $label',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color.shade700,
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 12),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
