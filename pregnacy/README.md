@@ -8,7 +8,7 @@ remote API server when available.
 
 ---
 
-## 📌 Key Features
+## Key Features
 
 1. **Authentication & Authorization**
    - Email/password sign‑in with **multifactor authentication (MFA)** support.
