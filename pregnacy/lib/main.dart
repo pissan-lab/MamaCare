@@ -5,6 +5,7 @@ import 'screens/auth/role_login_screen.dart';
 import 'screens/admin/admin_dashboard_screen.dart';
 import 'screens/doctor/doctor_dashboard_screen.dart';
 import 'screens/patient/patient_dashboard_screen.dart';
+import 'screens/auth/patient_onboarding_screen.dart';
 import 'screens/privacy_settings_screen.dart';
 import 'services/database_service.dart';
 import 'services/auth_service.dart';
@@ -60,6 +61,7 @@ class _PregnancyAppState extends State<PregnancyApp> {
         '/admin-dashboard': (context) => const AdminDashboardScreen(),
         '/doctor-dashboard': (context) => const DoctorDashboardScreen(),
         '/patient-dashboard': (context) => const PatientDashboardScreen(),
+        '/patient-onboarding': (context) => const PatientOnboardingScreen(),
         '/privacy': (context) => const PrivacySettingsScreen(),
       },
     );
