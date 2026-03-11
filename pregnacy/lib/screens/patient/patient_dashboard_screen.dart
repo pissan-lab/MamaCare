@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mamacare/services/auth_service.dart';
+import 'package:mamacare/screens/patient/patient_profile_screen.dart';
 
 // ─── Colours ───────────────────────────────────────────────────────────────
 class AppColors {
@@ -217,7 +218,7 @@ class _ProfileDropdown extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Amara Osei',
+                    const Text('Aisha Kamau',
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -253,6 +254,12 @@ class _ProfileDropdown extends StatelessWidget {
         if (value == 'signout') {
           AuthService.instance.logout();
           Navigator.of(context).pushReplacementNamed('/');
+        } else if (value == 'profile') {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const PatientProfileScreen(),
+            ),
+          );
         }
       },
     );
@@ -407,7 +414,7 @@ class _Sidebar extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text('Amara Osei',
+                    Text('Aisha Kamau',
                         style: TextStyle(
                             fontSize: 13,
                             color: Color(0xFFF5E6E0),
@@ -521,7 +528,7 @@ class _Topbar extends StatelessWidget {
                   children: const [
                     TextSpan(text: 'Good morning, '),
                     TextSpan(
-                      text: 'Amara ',
+                      text: 'Aisha ',
                       style: TextStyle(
                           fontStyle: FontStyle.italic, color: AppColors.rose),
                     ),
@@ -1351,7 +1358,7 @@ class _AppointmentsBody extends StatelessWidget {
           _ApptSection(title: 'Upcoming Appointments', badge: '3 upcoming', children: const [
             _ListApptCard(
               title: 'Antenatal Check-up',
-              doctor: 'Dr. Amara Osei',
+              doctor: 'Dr. Grace Mwangi',
               date: 'Mon, 24 Jul 2025',
               time: '9:00 AM',
               type: 'In-person',
@@ -2372,7 +2379,7 @@ class _MessagesBodyState extends State<_MessagesBody> {
   ];
 
   final _messages = const [
-    _Msg(text: 'Good morning Amara! How are you feeling today?', fromMe: false, time: '9:15 AM'),
+    _Msg(text: 'Good morning Aisha! How are you feeling today?', fromMe: false, time: '9:15 AM'),
     _Msg(text: 'Good morning Dr. Njenga, I\'ve been a bit tired but otherwise fine.', fromMe: true, time: '9:22 AM'),
     _Msg(text: 'That\'s normal at 24 weeks. Make sure you\'re resting enough and taking your supplements.', fromMe: false, time: '9:25 AM'),
     _Msg(text: 'Your anomaly scan results look great! Baby\'s growth is right on track 🎉', fromMe: false, time: '10:32 AM'),
