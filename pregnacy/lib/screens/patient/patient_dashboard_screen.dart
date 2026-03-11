@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class AppColors {
   static const blush = Color(0xFFF5E6E0);
   static const rose = Color(0xFFD4847A);
-  static const deep = Color(0xFF3D2C2C);
+  static const sidebar = Color(0xFF3D2C2C); // matches login page left panel
+  static const deep = Color(0xFF3D2C2C);   // text color
   static const sage = Color(0xFF8AAB9B);
   static const cream = Color(0xFFFDF6F0);
   static const warm = Color(0xFFE8C9B8);
@@ -68,7 +69,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
       return Scaffold(
         backgroundColor: AppColors.cream,
         appBar: AppBar(
-          backgroundColor: AppColors.deep,
+          backgroundColor: AppColors.sidebar,
           elevation: 0,
           iconTheme: const IconThemeData(color: AppColors.blush),
           title: RichText(
@@ -85,7 +86,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
           ),
         ),
         drawer: Drawer(
-          backgroundColor: AppColors.deep,
+          backgroundColor: AppColors.sidebar,
           child: _Sidebar(
             navItems: _navItems,
             selectedIndex: _selectedIndex,
@@ -98,7 +99,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
         body: _body,
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex > 3 ? 3 : _selectedIndex,
-          backgroundColor: AppColors.deep,
+          backgroundColor: AppColors.sidebar,
           selectedItemColor: AppColors.rose,
           unselectedItemColor: Colors.white38,
           type: BottomNavigationBarType.fixed,
@@ -139,7 +140,7 @@ class _Sidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 230,
-      color: AppColors.deep,
+      color: AppColors.sidebar,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -404,7 +405,7 @@ class _WeekHeroCard extends StatelessWidget {
       padding: EdgeInsets.all(isMobile ? 20.0 : 36.0),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF3D2C2C), Color(0xFF5A3838)],
+          colors: [Color(0xFF3D2C2C), Color(0xFF2C1F1F)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -675,29 +676,29 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
-    const cards = [
-      _StatCard(icon: '\u2696\ufe0f', iconBg: Color(0xFFFAE8E6), label: 'Weight', value: '68.2', unit: 'kg', note: '\u2191 0.4 kg since last visit'),
-      _StatCard(icon: '\ud83d\udc93', iconBg: Color(0xFFE6F0EC), label: 'Baby Heart Rate', value: '148', unit: 'bpm', note: 'Recorded Feb 28 · Normal'),
-      _StatCard(icon: '\ud83e\ude78', iconBg: Color(0xFFFAF0E8), label: 'Blood Pressure', value: '118/76', unit: 'mmHg', note: 'Healthy · Checked Mar 1'),
-    ];
+    const item0 = _StatCard(icon: '\u2696\ufe0f', iconBg: Color(0xFFFAE8E6), label: 'Weight', value: '68.2', unit: 'kg', note: '\u2191 0.4 kg since last visit');
+    const item1 = _StatCard(icon: '\ud83d\udc93', iconBg: Color(0xFFE6F0EC), label: 'Baby Heart Rate', value: '148', unit: 'bpm', note: 'Recorded Feb 28 · Normal');
+    const item2 = _StatCard(icon: '\ud83e\ude78', iconBg: Color(0xFFFAF0E8), label: 'Blood Pressure', value: '118/76', unit: 'mmHg', note: 'Healthy · Checked Mar 1');
     if (isMobile) {
-      return GridView.count(
-        crossAxisCount: 2,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.35,
-        children: cards,
+      return Column(
+        children: [
+          Row(children: [
+            Expanded(child: item0),
+            const SizedBox(width: 12),
+            Expanded(child: item1),
+          ]),
+          const SizedBox(height: 12),
+          SizedBox(width: double.infinity, child: item2),
+        ],
       );
     }
     return Row(
       children: [
-        Expanded(child: cards[0]),
+        Expanded(child: item0),
         const SizedBox(width: 16),
-        Expanded(child: cards[1]),
+        Expanded(child: item1),
         const SizedBox(width: 16),
-        Expanded(child: cards[2]),
+        Expanded(child: item2),
       ],
     );
   }
@@ -722,49 +723,54 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 700;
+    final pad = isMobile ? 14.0 : 24.0;
+    final iconSize = isMobile ? 36.0 : 44.0;
+    final iconFs = isMobile ? 16.0 : 20.0;
+    final valFs = isMobile ? 22.0 : 28.0;
+    final unitFs = isMobile ? 12.0 : 14.0;
+    final noteFs = isMobile ? 10.0 : 12.0;
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(pad),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.rose.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 44,
-            height: 44,
-            decoration:
-                BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(14)),
-            child: Center(child: Text(icon, style: const TextStyle(fontSize: 20))),
+            width: iconSize,
+            height: iconSize,
+            decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(12)),
+            child: Center(child: Text(icon, style: TextStyle(fontSize: iconFs))),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: isMobile ? 10.0 : 16.0),
           Text(label.toUpperCase(),
-              style: const TextStyle(
-                  fontSize: 10,
-                  letterSpacing: 1.8,
-                  color: AppColors.muted)),
-          const SizedBox(height: 6),
+              style: TextStyle(fontSize: 9, letterSpacing: 1.6, color: AppColors.muted)),
+          const SizedBox(height: 4),
           RichText(
             text: TextSpan(
-              style: const TextStyle(
+              style: TextStyle(
                   fontFamily: 'Georgia',
-                  fontSize: 28,
+                  fontSize: valFs,
                   fontWeight: FontWeight.w400,
                   color: AppColors.deep),
               children: [
                 TextSpan(text: value),
                 TextSpan(
                     text: ' $unit',
-                    style: const TextStyle(
-                        fontSize: 14, color: AppColors.muted)),
+                    style: TextStyle(fontSize: unitFs, color: AppColors.muted)),
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(note,
-              style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: noteFs, color: AppColors.muted)),
         ],
       ),
     );
@@ -1003,17 +1009,22 @@ class _AppointmentItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: AppColors.deep)),
                     const SizedBox(height: 3),
                     Text(meta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             fontSize: 12, color: AppColors.muted)),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -1042,29 +1053,27 @@ class _QuickLinksRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
-    const cards = [
-      _QuickLinkCard(icon: '\ud83d\udcdd', iconBg: Color(0xFFFAE8E6), title: 'Log Symptoms', subtitle: 'Track how you feel today'),
-      _QuickLinkCard(icon: '\ud83d\udc8a', iconBg: Color(0xFFE6F0EC), title: 'Medications', subtitle: 'Folic acid · Iron · Vitamin D'),
-      _QuickLinkCard(icon: '\ud83c\udf93', iconBg: Color(0xFFFAF0E8), title: 'Birth Prep Classes', subtitle: 'Next class: March 15'),
-    ];
+    const c0 = _QuickLinkCard(icon: '\ud83d\udcdd', iconBg: Color(0xFFFAE8E6), title: 'Log Symptoms', subtitle: 'Track how you feel today');
+    const c1 = _QuickLinkCard(icon: '\ud83d\udc8a', iconBg: Color(0xFFE6F0EC), title: 'Medications', subtitle: 'Folic acid · Iron · Vitamin D');
+    const c2 = _QuickLinkCard(icon: '\ud83c\udf93', iconBg: Color(0xFFFAF0E8), title: 'Birth Prep Classes', subtitle: 'Next class: March 15');
     if (isMobile) {
-      return GridView.count(
-        crossAxisCount: 2,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.6,
-        children: cards,
+      return Column(
+        children: [
+          c0,
+          const SizedBox(height: 10),
+          c1,
+          const SizedBox(height: 10),
+          c2,
+        ],
       );
     }
     return Row(
       children: [
-        Expanded(child: cards[0]),
+        Expanded(child: c0),
         const SizedBox(width: 16),
-        Expanded(child: cards[1]),
+        Expanded(child: c1),
         const SizedBox(width: 16),
-        Expanded(child: cards[2]),
+        Expanded(child: c2),
       ],
     );
   }
@@ -1097,7 +1106,7 @@ class _QuickLinkCardState extends State<_QuickLinkCard> {
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.all(22),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -1131,19 +1140,26 @@ class _QuickLinkCardState extends State<_QuickLinkCard> {
               ),
             ),
             const SizedBox(width: 14),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.title,
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.deep)),
-                const SizedBox(height: 3),
-                Text(widget.subtitle,
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.muted)),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(widget.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.deep)),
+                  const SizedBox(height: 3),
+                  Text(widget.subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 12, color: AppColors.muted)),
+                ],
+              ),
             ),
           ],
         ),

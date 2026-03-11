@@ -81,8 +81,8 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFE8E8F5),
-              Color(0xFFF5F0FF),
+              Color(0xFFFDF6F0),
+              Color(0xFFF5E6E0),
             ],
           ),
         ),
@@ -121,7 +121,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF2D3561), Color(0xFF1A1F3A)],
+                colors: [Color(0xFF3D2C2C), Color(0xFF2C1F1F)],
               ),
             ),
             child: Column(
@@ -148,7 +148,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFFE8809C),
+                          color: Color(0xFFD4847A),
                           letterSpacing: 1,
                         ),
                       ),
@@ -192,10 +192,10 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
           height: 80,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isDark ? Colors.white : const Color(0xFFE8809C),
+            color: isDark ? Colors.white : const Color(0xFFD4847A),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFE8809C).withOpacity(0.3),
+                color: const Color(0xFFD4847A).withOpacity(0.3),
                 blurRadius: 20,
                 spreadRadius: 5,
               ),
@@ -205,7 +205,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
             child: Icon(
               Icons.pregnant_woman,
               size: 48,
-              color: isDark ? const Color(0xFFE8809C) : Colors.white,
+              color: isDark ? const Color(0xFFD4847A) : Colors.white,
             ),
           ),
         ),
@@ -215,7 +215,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFFE8809C),
+            color: isDark ? Colors.white : const Color(0xFFD4847A),
           ),
         ),
       ],
@@ -231,7 +231,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF2D3561),
+            color: Color(0xFF3D2C2C),
           ),
         ),
         const SizedBox(height: 8),
@@ -270,14 +270,14 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
           decoration: InputDecoration(
             labelText: 'Email',
             hintText: 'name@mamacare.com',
-            prefixIcon: const Icon(Icons.email, color: Color(0xFFE8809C)),
+            prefixIcon: const Icon(Icons.email, color: Color(0xFFD4847A)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE8809C), width: 2),
+              borderSide: const BorderSide(color: Color(0xFFD4847A), width: 2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE8809C), width: 2),
+              borderSide: const BorderSide(color: Color(0xFFD4847A), width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
@@ -292,7 +292,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
           decoration: InputDecoration(
             labelText: 'Password',
             hintText: 'Enter your password',
-            prefixIcon: const Icon(Icons.lock, color: Color(0xFFE8809C)),
+            prefixIcon: const Icon(Icons.lock, color: Color(0xFFD4847A)),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -304,11 +304,11 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE8809C), width: 2),
+              borderSide: const BorderSide(color: Color(0xFFD4847A), width: 2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE8809C), width: 2),
+              borderSide: const BorderSide(color: Color(0xFFD4847A), width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
@@ -352,7 +352,8 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE8809C),
+              backgroundColor: const Color(0xFFD4847A),
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -365,9 +366,9 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.blue[50],
+            color: const Color(0xFFF5E6E0),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.blue[200]!),
+            border: Border.all(color: const Color(0xFFD4847A).withOpacity(0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,10 +397,10 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE8809C) : Colors.white,
+          color: isSelected ? const Color(0xFFD4847A) : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? const Color(0xFFE8809C) : Colors.grey[300]!,
+            color: isSelected ? const Color(0xFFD4847A) : Colors.grey[300]!,
             width: 2,
           ),
         ),
@@ -407,7 +408,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : const Color(0xFFE8809C),
+              color: isSelected ? Colors.white : const Color(0xFFD4847A),
               size: 24,
             ),
             const SizedBox(height: 4),
@@ -416,7 +417,7 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : const Color(0xFFE8809C),
+                color: isSelected ? Colors.white : const Color(0xFFD4847A),
               ),
             ),
           ],
