@@ -4,7 +4,7 @@ import '../../models/contraction.dart';
 class ContractionTrackerScreen extends StatefulWidget {
   const ContractionTrackerScreen({Key? key}) : super(key: key);
 
-  @override
+  @overridec
   State<ContractionTrackerScreen> createState() => _ContractionTrackerScreenState();
 }
 

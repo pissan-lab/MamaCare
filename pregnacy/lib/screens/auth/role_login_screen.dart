@@ -47,7 +47,17 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      // Navigate to the correct dashboard for this user's actual role.
+      // Verify the logged-in user's actual role matches the selected role tab.
+      final actualRole = _authService.currentUser?.role;
+      if (actualRole != _selectedRole) {
+        // Role mismatch – treat as a failed login for this portal.
+        await _authService.logout();
+        setState(() {
+          _errorMessage = 'These credentials do not belong to a ${_roleLabel(_selectedRole)} account.';
+          _isLoading = false;
+        });
+        return;
+      }
       _navigateToDashboard();
     } else {
       setState(() {
@@ -57,9 +67,15 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
     }
   }
 
+  String _roleLabel(UserRole role) {
+    switch (role) {
+      case UserRole.doctor:  return 'Doctor';
+      case UserRole.admin:   return 'Admin';
+      case UserRole.patient: return 'Patient';
+    }
+  }
+
   void _navigateToDashboard() {
-    // Navigate based on the actual logged-in user's role,
-    // not the role selector (which is just a UI hint).
     final role = _authService.currentUser?.role;
     final route = role == UserRole.admin
         ? '/admin-dashboard'
