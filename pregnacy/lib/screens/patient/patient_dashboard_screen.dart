@@ -434,6 +434,7 @@ class _WeekHeroCard extends StatelessWidget {
                   text: const TextSpan(
                     style: TextStyle(fontFamily: 'Georgia', color: Colors.white),
                     children: [
+                      
                       TextSpan(
                           text: '24',
                           style: TextStyle(
