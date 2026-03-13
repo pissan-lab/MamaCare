@@ -30,7 +30,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -140,15 +140,21 @@ class DatabaseService {
 
     // Seed default users
     await _seedUsers(db);
+    await _seedSystemLogs(db);
 
     print('✅ Database tables created successfully');
   }
 
-  // Upgrade handler — seeds new demo users when upgrading from v1 → v2
+  // Upgrade handler — seeds demo users/logs for existing installs
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await _seedUsers(db);
       print('✅ Database upgraded to version $newVersion');
+    }
+    if (oldVersion < 3) {
+      await _seedUsers(db);
+      await _seedSystemLogs(db);
+      print('✅ Demo logs seeded for version $newVersion');
     }
   }
 
@@ -187,7 +193,119 @@ class DatabaseService {
       'preferences': null,
     }, conflictAlgorithm: ConflictAlgorithm.ignore);
 
+    await db.insert('users', {
+      'email': 'doctor2@mamacare.com',
+      'password': 'doctor123',
+      'name': 'Dr. Amina Yusuf',
+      'role': 'doctor',
+      'specialization': 'Gynecology',
+      'is_active': 1,
+      'created_at': now,
+      'preferences': null,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
+    await db.insert('users', {
+      'email': 'patient2@mamacare.com',
+      'password': 'patient123',
+      'name': 'Aisha Kamau',
+      'role': 'patient',
+      'is_active': 1,
+      'created_at': now,
+      'preferences': null,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
+    await db.insert('users', {
+      'email': 'patient3@mamacare.com',
+      'password': 'patient123',
+      'name': 'Miriam Otieno',
+      'role': 'patient',
+      'is_active': 1,
+      'created_at': now,
+      'preferences': null,
+    }, conflictAlgorithm: ConflictAlgorithm.ignore);
+
     print('✅ Seed users inserted');
+  }
+
+  Future<void> _seedSystemLogs(Database db) async {
+    final logs = [
+      {
+        'user_id': '1',
+        'user_role': 'admin',
+        'action': 'LOGIN',
+        'description': 'Admin User logged in',
+        'timestamp': '2026-03-12T08:30:00.000',
+      },
+      {
+        'user_id': '2',
+        'user_role': 'doctor',
+        'action': 'DATA_UPDATED',
+        'description': 'Dr. Smith updated prenatal care notes for Jane Doe',
+        'timestamp': '2026-03-12T09:15:00.000',
+        'affected_record_id': '3',
+        'affected_record_type': 'users',
+        'previous_value': 'Next visit in 4 weeks',
+        'new_value': 'Next visit in 2 weeks due to elevated BP',
+      },
+      {
+        'user_id': '4',
+        'user_role': 'doctor',
+        'action': 'LOGIN',
+        'description': 'Dr. Amina Yusuf logged in',
+        'timestamp': '2026-03-12T10:05:00.000',
+      },
+      {
+        'user_id': '1',
+        'user_role': 'admin',
+        'action': 'USER_CREATED',
+        'description': 'New user created: Aisha Kamau (patient2@mamacare.com)',
+        'timestamp': '2026-03-12T11:25:00.000',
+        'affected_record_id': '5',
+        'affected_record_type': 'users',
+        'new_value': 'patient2@mamacare.com',
+      },
+      {
+        'user_id': '1',
+        'user_role': 'admin',
+        'action': 'USER_CREATED',
+        'description': 'New user created: Miriam Otieno (patient3@mamacare.com)',
+        'timestamp': '2026-03-12T11:29:00.000',
+        'affected_record_id': '6',
+        'affected_record_type': 'users',
+        'new_value': 'patient3@mamacare.com',
+      },
+      {
+        'user_id': '1',
+        'user_role': 'admin',
+        'action': 'DATA_UPDATED',
+        'description': 'Admin User changed notification policy settings',
+        'timestamp': '2026-03-12T12:00:00.000',
+        'affected_record_type': 'settings',
+        'previous_value': 'Daily summary at 7:00 AM',
+        'new_value': 'Daily summary at 8:00 AM',
+      },
+      {
+        'user_id': '1',
+        'user_role': 'admin',
+        'action': 'USER_DEACTIVATED',
+        'description': 'Archived inactive test patient account',
+        'timestamp': '2026-03-12T12:35:00.000',
+        'affected_record_id': '99',
+        'affected_record_type': 'users',
+      },
+    ];
+
+    for (final log in logs) {
+      final existing = await db.query(
+        'system_logs',
+        where: 'user_id = ? AND action = ? AND timestamp = ?',
+        whereArgs: [log['user_id'], log['action'], log['timestamp']],
+      );
+
+      if (existing.isEmpty) {
+        await db.insert('system_logs', log);
+      }
+    }
   }
 
   // Initialize database (call this in main.dart)

@@ -37,6 +37,16 @@ class AuthService {
       isActive: true,
       createdAt: '2026-01-01T00:00:00.000',
     ),
+    'doctor2@mamacare.com': User(
+      id: 4,
+      email: 'doctor2@mamacare.com',
+      password: 'doctor123',
+      name: 'Dr. Amina Yusuf',
+      role: UserRole.doctor,
+      specialization: 'Gynecology',
+      isActive: true,
+      createdAt: '2026-01-02T00:00:00.000',
+    ),
     'patient@mamacare.com': User(
       id: 3,
       email: 'patient@mamacare.com',
@@ -45,6 +55,24 @@ class AuthService {
       role: UserRole.patient,
       isActive: true,
       createdAt: '2026-01-01T00:00:00.000',
+    ),
+    'patient2@mamacare.com': User(
+      id: 5,
+      email: 'patient2@mamacare.com',
+      password: 'patient123',
+      name: 'Aisha Kamau',
+      role: UserRole.patient,
+      isActive: true,
+      createdAt: '2026-01-03T00:00:00.000',
+    ),
+    'patient3@mamacare.com': User(
+      id: 6,
+      email: 'patient3@mamacare.com',
+      password: 'patient123',
+      name: 'Miriam Otieno',
+      role: UserRole.patient,
+      isActive: true,
+      createdAt: '2026-01-04T00:00:00.000',
     ),
   };
 
@@ -259,11 +287,22 @@ class AuthService {
         return [];
       }
 
+      if (kIsWeb) {
+        return _demoUsers.values.toList()
+          ..sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
+      }
+
       final users = await _dbService.query('users');
+      if (users.isEmpty) {
+        return _demoUsers.values.toList()
+          ..sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
+      }
+
       return users.map((u) => User.fromMap(u)).toList();
     } catch (e) {
       print('❌ Error fetching users: $e');
-      return [];
+      return _demoUsers.values.toList()
+        ..sort((a, b) => (a.id ?? 0).compareTo(b.id ?? 0));
     }
   }
 

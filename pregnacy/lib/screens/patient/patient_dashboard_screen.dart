@@ -363,38 +363,44 @@ class _Sidebar extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Nav items
-          ...List.generate(navItems.length, (i) {
-            if (i == 4) {
-              return Column(
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(24, 16, 24, 8),
-                    child: Text(
-                      'MY JOURNEY',
-                      style: TextStyle(
-                          fontSize: 10,
-                          letterSpacing: 2,
-                          color: Colors.white24,
-                          fontFamily: 'Georgia'),
-                    ),
-                  ),
-                  _SidebarItem(
+                children: List.generate(navItems.length, (i) {
+                  if (i == 4) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(24, 16, 24, 8),
+                          child: Text(
+                            'MY JOURNEY',
+                            style: TextStyle(
+                                fontSize: 10,
+                                letterSpacing: 2,
+                                color: Colors.white24,
+                                fontFamily: 'Georgia'),
+                          ),
+                        ),
+                        _SidebarItem(
+                          item: navItems[i],
+                          isSelected: selectedIndex == i,
+                          onTap: () => onItemTapped(i),
+                        ),
+                      ],
+                    );
+                  }
+                  return _SidebarItem(
                     item: navItems[i],
                     isSelected: selectedIndex == i,
                     onTap: () => onItemTapped(i),
-                  ),
-                ],
-              );
-            }
-            return _SidebarItem(
-              item: navItems[i],
-              isSelected: selectedIndex == i,
-              onTap: () => onItemTapped(i),
-            );
-          }),
+                  );
+                }),
+              ),
+            ),
+          ),
 
-          const Spacer(),
           const Divider(color: Colors.white10, height: 1),
           // Patient chip
           Padding(
