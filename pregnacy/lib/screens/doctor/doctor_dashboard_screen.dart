@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 class DC {
-  static const navy  = Color(0xFF1A2B4A);
-  static const blue  = Color(0xFF3B6FD4);
-  static const sky   = Color(0xFFE8EFFE);
-  static const teal  = Color(0xFF3BBFAD);
-  static const cream = Color(0xFFF4F7FF);
+  static const navy  = Color(0xFF3D2C2C);
+  static const blue  = Color(0xFFD4847A);
+  static const sky   = Color(0xFFF5E6E0);
+  static const teal  = Color(0xFFE8C9B8);
+  static const cream = Color(0xFFFDF6F0);
   static const white = Colors.white;
-  static const text  = Color(0xFF1A2B4A);
-  static const muted = Color(0xFF8A97B0);
+  static const text  = Color(0xFF4A3535);
+  static const muted = Color(0xFF9B8080);
   static const rose  = Color(0xFFD4847A);
   static const amber = Color(0xFFE8A44A);
   static const green = Color(0xFF4AAB72);
@@ -190,26 +190,47 @@ class DoctorDashboardScreen extends StatefulWidget {
 class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   int _tab = 0;
 
-  final _tabs  = ['Dashboard', 'Patients', 'Schedule', 'Messages', 'Analytics'];
+  final _tabs  = ['Dashboard', 'Patients', 'Schedule', 'Messages'];
   final _icons = [
     Icons.grid_view_rounded,
     Icons.people_outline_rounded,
     Icons.calendar_month_outlined,
     Icons.chat_bubble_outline_rounded,
-    Icons.bar_chart_rounded,
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: DC.cream,
-      body: SafeArea(child: _buildBody()),
-      bottomNavigationBar: _BottomNav(
-        currentIndex: _tab,
-        tabs: _tabs,
-        icons: _icons,
-        onTap: (i) => setState(() => _tab = i),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 1000;
+
+        return Scaffold(
+          backgroundColor: DC.cream,
+          body: SafeArea(
+            child: isWide
+                ? Row(
+                    children: [
+                      _SideNav(
+                        currentIndex: _tab,
+                        tabs: _tabs,
+                        icons: _icons,
+                        onTap: (i) => setState(() => _tab = i),
+                      ),
+                      Expanded(child: _buildBody()),
+                    ],
+                  )
+                : _buildBody(),
+          ),
+          bottomNavigationBar: isWide
+              ? null
+              : _BottomNav(
+                  currentIndex: _tab,
+                  tabs: _tabs,
+                  icons: _icons,
+                  onTap: (i) => setState(() => _tab = i),
+                ),
+        );
+      },
     );
   }
 
@@ -219,9 +240,126 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       case 1: return const _PatientsTab();
       case 2: return const _ScheduleTab();
       case 3: return const _MessagesTab();
-      case 4: return const _AnalyticsTab();
       default: return const _HomeTab();
     }
+  }
+}
+
+class _SideNav extends StatelessWidget {
+  final int currentIndex;
+  final List<String> tabs;
+  final List<IconData> icons;
+  final ValueChanged<int> onTap;
+
+  const _SideNav({required this.currentIndex, required this.tabs, required this.icons, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 280,
+      color: const Color(0xFFD4847A),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 20, 12, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(6, 0, 6, 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Home',
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 24),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(6, 6, 6, 10),
+              child: Text(
+                'Doctor Workspace',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            ...List.generate(tabs.length, (i) {
+              final active = i == currentIndex;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(11),
+                  onTap: () => onTap(i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: active ? Colors.white.withOpacity(0.16) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(icons[i], size: 24, color: Colors.white.withOpacity(active ? 0.95 : 0.85)),
+                        const SizedBox(width: 14),
+                        Text(
+                          tabs[i],
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: Colors.white,
+                            fontWeight: active ? FontWeight.w600 : FontWeight.w500,
+                            height: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+            const Spacer(),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Colors.white24,
+                    child: Text('DR', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Dr. Njenga',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.95),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, color: Colors.white.withOpacity(0.9), size: 18),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -239,7 +377,7 @@ class _BottomNav extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: DC.white,
-        border: Border(top: BorderSide(color: Color(0xFFE8EFFE))),
+        border: Border(top: BorderSide(color: DC.sky)),
       ),
       child: SafeArea(
         top: false,
@@ -294,116 +432,164 @@ class _HomeTab extends StatelessWidget {
         .where((a) => a.date == 'Mar 6' || a.date == 'Mar 7')
         .toList();
 
-    return SingleChildScrollView(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // Header
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [DC.navy, Color(0xFF2A4A7A)],
-              begin: Alignment.topLeft, end: Alignment.bottomRight,
-            ),
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 980;
+
+        return SingleChildScrollView(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              CircleAvatar(radius: 22, backgroundColor: DC.blue,
-                child: const Text('NJ', style: TextStyle(color: Colors.white, fontFamily: 'Georgia', fontSize: 16))),
-              const SizedBox(width: 12),
-              const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Dr. Njenga', style: TextStyle(fontFamily: 'Georgia', fontSize: 18, color: Colors.white, fontWeight: FontWeight.w400)),
-                Text("OB/GYN \u00b7 Nairobi Women's Hospital", style: TextStyle(fontSize: 12, color: Colors.white54)),
-              ]),
-              const Spacer(),
-              Stack(children: [
-                const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 26),
-                Positioned(right: 0, top: 0,
-                  child: Container(width: 8, height: 8,
-                    decoration: const BoxDecoration(color: DC.rose, shape: BoxShape.circle))),
-              ]),
-            ]),
+            _buildHeader(),
             const SizedBox(height: 20),
-            const Text('Good morning, Doctor \ud83d\udc4b',
-                style: TextStyle(fontFamily: 'Georgia', fontSize: 22, color: Colors.white, fontWeight: FontWeight.w300)),
-            const SizedBox(height: 4),
-            const Text('Thursday, March 5, 2026', style: TextStyle(fontSize: 13, color: Colors.white54)),
+            if (critical > 0) _buildAlertBanner(critical),
+            _buildStatsRow(critical, attention),
+            const SizedBox(height: 24),
+            if (isWide)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _buildScheduleSection(todayAppts),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: _buildAttentionSection(),
+                    ),
+                  ],
+                ),
+              )
+            else ...[
+              _buildScheduleSection(todayAppts),
+              const SizedBox(height: 24),
+              _buildAttentionSection(),
+            ],
+            const SizedBox(height: 24),
           ]),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [DC.navy, Color(0xFF6B4545)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-
-        const SizedBox(height: 20),
-
-        // Alert banner
-        if (critical > 0)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFECEC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE05252).withOpacity(0.3)),
-              ),
-              child: Row(children: [
-                const Icon(Icons.warning_amber_rounded, color: Color(0xFFE05252), size: 22),
-                const SizedBox(width: 10),
-                Expanded(child: Text(
-                  '$critical patient${critical > 1 ? "s" : ""} need${critical == 1 ? "s" : ""} urgent attention',
-                  style: const TextStyle(fontSize: 13, color: Color(0xFFE05252), fontWeight: FontWeight.w600))),
-                const Icon(Icons.chevron_right_rounded, color: Color(0xFFE05252)),
-              ]),
-            ),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: DC.blue,
+            child: const Text('NJ', style: TextStyle(color: Colors.white, fontFamily: 'Georgia', fontSize: 16)),
           ),
-
-        // Stats row
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(children: [
-            Expanded(child: _StatCard(value: '${assignedPatients.length}', label: 'My Patients', icon: Icons.people_outline_rounded, color: DC.blue)),
-            const SizedBox(width: 12),
-            Expanded(child: _StatCard(value: '$critical', label: 'Critical', icon: Icons.priority_high_rounded, color: const Color(0xFFE05252))),
-            const SizedBox(width: 12),
-            Expanded(child: _StatCard(value: '$attention', label: 'Watch', icon: Icons.visibility_outlined, color: DC.amber)),
+          const SizedBox(width: 12),
+          const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Dr. Njenga', style: TextStyle(fontFamily: 'Georgia', fontSize: 18, color: Colors.white, fontWeight: FontWeight.w400)),
+            Text("OB/GYN \u00b7 Nairobi Women's Hospital", style: TextStyle(fontSize: 12, color: Colors.white54)),
           ]),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Today's schedule
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
-            Text("Today's Schedule", style: TextStyle(fontFamily: 'Georgia', fontSize: 18, color: DC.navy)),
-            Text('View all', style: TextStyle(fontSize: 13, color: DC.blue)),
+          const Spacer(),
+          Stack(children: [
+            const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 26),
+            Positioned(
+              right: 0,
+              top: 0,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(color: DC.rose, shape: BoxShape.circle),
+              ),
+            ),
           ]),
-        ),
-        const SizedBox(height: 12),
-        if (todayAppts.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Text('No appointments today.', style: TextStyle(color: DC.muted, fontSize: 13)),
-          )
-        else
-          ...assignedPatients
-              .where((p) => p.appointments.any((a) => a.date == 'Mar 6' || a.date == 'Mar 7'))
-              .map((p) {
-            final appt = p.appointments.firstWhere((a) => a.date == 'Mar 6' || a.date == 'Mar 7');
-            return _TodayApptCard(patient: p, appointment: appt);
-          }),
-
-        const SizedBox(height: 24),
-
-        // Patients needing attention
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Text('Patients Needing Attention', style: TextStyle(fontFamily: 'Georgia', fontSize: 18, color: DC.navy)),
-        ),
-        const SizedBox(height: 12),
-        ...assignedPatients
-            .where((p) => p.status == 'critical' || p.status == 'attention')
-            .map((p) => _PatientCard(patient: p, compact: true)),
-        const SizedBox(height: 24),
+        ]),
+        const SizedBox(height: 20),
+        const Text('Good morning, Doctor \ud83d\udc4b',
+            style: TextStyle(fontFamily: 'Georgia', fontSize: 22, color: Colors.white, fontWeight: FontWeight.w300)),
+        const SizedBox(height: 4),
+        const Text('Thursday, March 5, 2026', style: TextStyle(fontSize: 13, color: Colors.white54)),
       ]),
     );
+  }
+
+  Widget _buildAlertBanner(int critical) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFECEC),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE05252).withOpacity(0.3)),
+        ),
+        child: Row(children: [
+          const Icon(Icons.warning_amber_rounded, color: Color(0xFFE05252), size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              '$critical patient${critical > 1 ? "s" : ""} need${critical == 1 ? "s" : ""} urgent attention',
+              style: const TextStyle(fontSize: 13, color: Color(0xFFE05252), fontWeight: FontWeight.w600),
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded, color: Color(0xFFE05252)),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildStatsRow(int critical, int attention) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(children: [
+        Expanded(child: _StatCard(value: '${assignedPatients.length}', label: 'My Patients', icon: Icons.people_outline_rounded, color: DC.blue)),
+        const SizedBox(width: 12),
+        Expanded(child: _StatCard(value: '$critical', label: 'Critical', icon: Icons.priority_high_rounded, color: const Color(0xFFE05252))),
+        const SizedBox(width: 12),
+        Expanded(child: _StatCard(value: '$attention', label: 'Watch', icon: Icons.visibility_outlined, color: DC.amber)),
+      ]),
+    );
+  }
+
+  Widget _buildScheduleSection(List<Appointment> todayAppts) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+          Text("Today's Schedule", style: TextStyle(fontFamily: 'Georgia', fontSize: 18, color: DC.navy)),
+          Text('View all', style: TextStyle(fontSize: 13, color: DC.blue)),
+        ]),
+      ),
+      const SizedBox(height: 12),
+      if (todayAppts.isEmpty)
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Text('No appointments today.', style: TextStyle(color: DC.muted, fontSize: 13)),
+        )
+      else
+        ...assignedPatients
+            .where((p) => p.appointments.any((a) => a.date == 'Mar 6' || a.date == 'Mar 7'))
+            .map((p) {
+          final appt = p.appointments.firstWhere((a) => a.date == 'Mar 6' || a.date == 'Mar 7');
+          return _TodayApptCard(patient: p, appointment: appt);
+        }),
+    ]);
+  }
+
+  Widget _buildAttentionSection() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Text('Patients Needing Attention', style: TextStyle(fontFamily: 'Georgia', fontSize: 18, color: DC.navy)),
+      ),
+      const SizedBox(height: 12),
+      ...assignedPatients
+          .where((p) => p.status == 'critical' || p.status == 'attention')
+          .map((p) => _PatientCard(patient: p, compact: true)),
+    ]);
   }
 }
 
@@ -754,7 +940,7 @@ class _HealthRecordsTabState extends State<_HealthRecordsTab> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [DC.navy, Color(0xFF2A4A7A)],
+              colors: [DC.navy, Color(0xFF6B4545)],
               begin: Alignment.topLeft, end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),

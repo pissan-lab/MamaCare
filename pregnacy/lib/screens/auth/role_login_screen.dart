@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mamacare/services/auth_service.dart';
 import 'package:mamacare/models/user.dart';
+import 'signup_screen.dart';
 
 class RoleLoginScreen extends StatefulWidget {
   const RoleLoginScreen({Key? key}) : super(key: key);
@@ -377,6 +378,34 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
           ),
         ),
         const SizedBox(height: 16),
+
+        // Create Account Button
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SignupScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.person_add),
+            label: const Text(
+              'Create Account',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFFD4847A),
+              side: const BorderSide(color: Color(0xFFD4847A), width: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
 
         // Demo credentials info
         Container(

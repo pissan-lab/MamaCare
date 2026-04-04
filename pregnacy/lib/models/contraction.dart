@@ -48,3 +48,4 @@ class Contraction {
         notes: map['notes'],
       );
 }
+  
