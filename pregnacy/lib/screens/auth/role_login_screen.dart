@@ -1,8 +1,7 @@
 // lib/screens/auth/role_login_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:mamacare/services/auth_service.dart';
-import 'package:mamacare/models/user.dart';
+import 'package:mamacare/services/api_service.dart';
 import 'signup_screen.dart';
 
 class RoleLoginScreen extends StatefulWidget {
@@ -13,11 +12,9 @@ class RoleLoginScreen extends StatefulWidget {
 }
 
 class _RoleLoginScreenState extends State<RoleLoginScreen> {
-  final _authService = AuthService.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   
-  UserRole _selectedRole = UserRole.patient;
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _errorMessage;
@@ -40,47 +37,39 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
       _errorMessage = null;
     });
 
-    final success = await _authService.login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
+    try {
+      final response = await ApiService.instance.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (success) {
-      // Verify the logged-in user's actual role matches the selected role tab.
-      final actualRole = _authService.currentUser?.role;
-      if (actualRole != _selectedRole) {
-        // Role mismatch – treat as a failed login for this portal.
-        await _authService.logout();
-        setState(() {
-          _errorMessage = 'These credentials do not belong to a ${_roleLabel(_selectedRole)} account.';
-          _isLoading = false;
-        });
-        return;
-      }
-      _navigateToDashboard();
-    } else {
+      final user = response['user'];
+      final role = user?['role'] ?? 'patient';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✅ Login successful! Welcome ${user?['name'] ?? 'User'}'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      _navigateToDashboard(role);
+    } catch (e) {
+      if (!mounted) return;
       setState(() {
-        _errorMessage = 'Invalid email or password. Check the demo credentials below.';
+        _errorMessage = 'Invalid email or password';
         _isLoading = false;
       });
     }
   }
 
-  String _roleLabel(UserRole role) {
-    switch (role) {
-      case UserRole.doctor:  return 'Doctor';
-      case UserRole.admin:   return 'Admin';
-      case UserRole.patient: return 'Patient';
-    }
-  }
-
-  void _navigateToDashboard() {
-    final role = _authService.currentUser?.role;
-    final route = role == UserRole.admin
+  void _navigateToDashboard(String role) {
+    final route = role == 'admin'
         ? '/admin-dashboard'
-        : role == UserRole.doctor
+        : role == 'doctor'
             ? '/doctor-dashboard'
             : '/patient-dashboard';
 
@@ -260,26 +249,6 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
           ),
         ),
         const SizedBox(height: 32),
-        
-        // Role Selection
-        Text(
-          'Login As:',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildRoleButton('Admin', UserRole.admin, Icons.admin_panel_settings),
-            _buildRoleButton('Doctor', UserRole.doctor, Icons.local_hospital),
-            _buildRoleButton('Patient', UserRole.patient, Icons.person),
-          ],
-        ),
-        const SizedBox(height: 24),
 
         // Email Field
         TextField(
@@ -405,69 +374,9 @@ class _RoleLoginScreenState extends State<RoleLoginScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
 
-        // Demo credentials info
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5E6E0),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFD4847A).withOpacity(0.3)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                '📝 Demo Credentials:',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-              ),
-              SizedBox(height: 8),
-              Text('Patient:  patient@mamacare.com / patient123', style: TextStyle(fontSize: 11)),
-              SizedBox(height: 4),
-              Text('Doctor:   doctor@mamacare.com / doctor123',  style: TextStyle(fontSize: 11)),
-              SizedBox(height: 4),
-              Text('Admin:    admin@mamacare.com / admin123',     style: TextStyle(fontSize: 11)),
-            ],
-          ),
-        ),
       ],
     );
   }
 
-  Widget _buildRoleButton(String label, UserRole role, IconData icon) {
-    final isSelected = _selectedRole == role;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedRole = role),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD4847A) : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? const Color(0xFFD4847A) : Colors.grey[300]!,
-            width: 2,
-          ),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.white : const Color(0xFFD4847A),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : const Color(0xFFD4847A),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
